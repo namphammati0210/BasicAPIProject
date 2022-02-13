@@ -9,14 +9,14 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/register', (req, res) => {
-  res.render('register')
+  res.render('register');
 })
 
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password } = req.body; // destructuring ES6
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10); // 123 => ádfádgádzzzxxx
 
     const data = {
       name,
@@ -34,6 +34,31 @@ router.post('/register', async (req, res) => {
 
 router.get('/login', (req, res) => {
   res.render('login')
+});
+
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Check if email and password is empty
+    if(!email || !password) return res.redirect('/login');
+
+    // Check if email does not match with users in database.
+    const user = await UserModel.findOne({email});
+    if (!user) return res.redirect('/login');
+
+    // Check if password does not match with existing password in database.
+    user.checkPassword(password, (err, result) => {
+      if (err) return res.redirect('/login');
+
+      if (!result) return res.redirect('/login');
+
+      return res.send('login OK !!!');
+    })
+  } catch (error) {
+    console.log("🚀 ~ file: index.js ~ line 43 ~ router.post ~ error", error) // control + option + l
+    return res.redirect('/login');
+  }
 })
 
 module.exports = router;
