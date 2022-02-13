@@ -38,23 +38,29 @@ router.get('/login', (req, res) => {
 
 router.post('/login', async (req, res) => {
   try {
+    // return res.send(req.body);
     const { email, password } = req.body;
+
+    
 
     // Check if email and password is empty
     if(!email || !password) return res.redirect('/login');
 
     // Check if email does not match with users in database.
     const user = await UserModel.findOne({email});
+    console.log("🚀 ~ file: index.js ~ line 49 ~ router.post ~ user", user);
     if (!user) return res.redirect('/login');
 
     // Check if password does not match with existing password in database.
     user.checkPassword(password, (err, result) => {
+      console.log("🚀 ~ file: index.js ~ line 54 ~ user.checkPassword ~ result", result)
       if (err) return res.redirect('/login');
 
       if (!result) return res.redirect('/login');
 
       return res.send('login OK !!!');
     })
+
   } catch (error) {
     console.log("🚀 ~ file: index.js ~ line 43 ~ router.post ~ error", error) // control + option + l
     return res.redirect('/login');

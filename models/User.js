@@ -9,7 +9,7 @@ const userSchema = new Schema({
   password: { type: String, required: true}
 })
 
-userSchema.methods.checkPassword = (password, cb) => {
+userSchema.methods.checkPassword = function(password, cb) {
   bcrypt.compare(password, this.password, (error, result) => {
     return cb(error, result); // Closure
   })
