@@ -52,13 +52,15 @@ router.post('/login', async (req, res) => {
     if (!user) return res.redirect('/login');
 
     // Check if password does not match with existing password in database.
-    user.checkPassword(password, (err, result) => {
+    user.checkPassword(password, async (err, result) => {
       console.log("🚀 ~ file: index.js ~ line 54 ~ user.checkPassword ~ result", result)
       if (err) return res.redirect('/login');
 
       if (!result) return res.redirect('/login');
+      
+      const token = await user.createToken();
 
-      return res.send('login OK !!!');
+      return res.status(200).json({...user, token});
     })
 
   } catch (error) {
