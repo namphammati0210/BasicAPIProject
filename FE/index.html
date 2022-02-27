@@ -67,6 +67,25 @@
         }
       }
 
+      const handleDeleteUser = async (element) => {
+        const userId = element.dataset.userid;
+        console.log("🚀 ~ file: index.html ~ line 108 ~ deleteBtn.addEventListener ~ userId", userId);
+
+        const deletedUser = await deleteUser(userId);
+        console.log("🚀 ~ file: index.html ~ line 123 ~ deleteBtn.addEventListener ~ deletedUser", deletedUser);
+
+        // get all users
+        const users = await getUsers();
+
+        // Remove old users value
+        const tableBody = document.querySelector('#tableBody');
+        tableBody.innerHTML = '';
+
+        // Render new users value
+        renderUsersTable(users);
+      }
+
+      
       const renderUsersTable = (users) => {
         const tableBody = document.querySelector('#tableBody');
         
@@ -75,45 +94,18 @@
                         <td>${user.email}</td>
                         <td>${user.name}</td>
                         <td>${user.password}</td>
-                        <td><button class="btn btn-danger deleteUserBtn" data-userId=${user._id} >Delete</button></td>
+                        <td><button class="btn btn-danger deleteUserBtn" data-userId=${user._id} onClick="handleDeleteUser(this)">Delete</button></td>
                       </tr>`;
           tableBody.insertAdjacentHTML('afterbegin', html);
-          addEventDeleteUser();
         })
         
-      }
-
-      const addEventDeleteUser = () => {
-        const deleteButtons = document.querySelectorAll('.deleteUserBtn');
-        deleteButtons.forEach(deleteBtn => {
-          deleteBtn.addEventListener('click', async (event) => {
-            console.log('delete user');
-            const currentDeleteBtn = event.target;
-            const userId = currentDeleteBtn.dataset.userid;
-            console.log("🚀 ~ file: index.html ~ line 108 ~ deleteBtn.addEventListener ~ userId", userId);
-
-            const deletedUser = await deleteUser(userId);
-            console.log("🚀 ~ file: index.html ~ line 123 ~ deleteBtn.addEventListener ~ deletedUser", deletedUser);
-
-            // get all users
-            const users = await getUsers();
-
-            // Remove old users value
-            const tableBody = document.querySelector('#tableBody');
-            tableBody.innerHTML = '';
-
-            // Render new users value
-            renderUsersTable(users);
-          })
-        })
       }
 
       document.addEventListener("DOMContentLoaded", async (event) => {
         const users = await getUsers();
         renderUsersTable(users);
 
-        // Handle delete user
-        addEventDeleteUser();
+       
         
       });
     </script>
