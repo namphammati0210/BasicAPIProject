@@ -152,43 +152,43 @@
         })
       }
 
+      const handleCreateUser = async (event) => {
+        // Get user's input from create user modal
+        const name = document.querySelector('#newUserName').value;          
+        const email = document.querySelector('#newUserEmail').value;          
+        const password = document.querySelector('#newUserPassword').value;          
+
+        // Setup payload for create new user
+        const payload = {
+          name,
+          email,
+          password
+        }
+
+        // Create new user by calling api
+        const newUser = await createUser(payload);
+
+        // Close create modal after finsish
+        const closeModalBtn = document.querySelector('#close-create-modal');
+        closeModalBtn.click();
+
+        // Render new user's data into table of users
+        const tableBody = document.querySelector('#tableBody');
+        let html = `<tr>
+                      <td>${newUser.email}</td>
+                      <td>${newUser.name}</td>
+                      <td>${newUser.password}</td>
+                      <td><button class="btn btn-danger deleteUserBtn" data-userId=${newUser._id} onClick="handleDeleteUser(this)">Delete</button></td>
+                    </tr>`;
+        tableBody.insertAdjacentHTML('afterbegin', html);
+      }
+
       document.addEventListener("DOMContentLoaded", async (event) => {
         const users = await getUsers();
         renderUsersTable(users);
 
         const createUserBtn = document.querySelector('#create-user-btn');
-        
-        createUserBtn.addEventListener('click', async (event) => {
-
-          // Get user's input from create user modal
-          const name = document.querySelector('#newUserName').value;          
-          const email = document.querySelector('#newUserEmail').value;          
-          const password = document.querySelector('#newUserPassword').value;          
-
-          // Setup payload for create new user
-          const payload = {
-            name,
-            email,
-            password
-          }
-
-          // Create new user by calling api
-          const newUser = await createUser(payload);
-
-          // Close create modal after finsish
-          const closeModalBtn = document.querySelector('#close-create-modal');
-          closeModalBtn.click();
-
-          // Render new user's data into table of users
-          const tableBody = document.querySelector('#tableBody');
-          let html = `<tr>
-                        <td>${newUser.email}</td>
-                        <td>${newUser.name}</td>
-                        <td>${newUser.password}</td>
-                        <td><button class="btn btn-danger deleteUserBtn" data-userId=${newUser._id} onClick="handleDeleteUser(this)">Delete</button></td>
-                      </tr>`;
-          tableBody.insertAdjacentHTML('afterbegin', html);
-        })
+        createUserBtn.addEventListener('click', handleCreateUser);
       });
     </script>
   </body>
