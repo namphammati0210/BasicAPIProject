@@ -23,6 +23,8 @@
                 <th>Email</th>
                 <th>Name</th>
                 <th>Password</th>
+                <th>Delete</th>
+                <th>Update</th>
               </tr>
               </thead>
               <tbody id="tableBody">
@@ -35,42 +37,80 @@
     </div>
 
     <!-- Create Modal -->
-  <div class="modal fade" id="createUserModal" role="dialog">
-    <div class="modal-dialog">
-    
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Modal Header</h4>
-        </div>
-        <div class="modal-body">
-          <form>
-            <div class="form-group">
-              <label for="recipient-name" class="col-form-label">Name:</label>
-              <input type="text" class="form-control" id="newUserName">
-            </div>
-
-            <div class="form-group">
-              <label for="recipient-name" class="col-form-label">Email:</label>
-              <input type="text" class="form-control" id="newUserEmail">
-            </div>
-
-            <div class="form-group">
-              <label for="recipient-name" class="col-form-label">Password:</label>
-              <input type="text" class="form-control" id="newUserPassword">
-            </div>
-            
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal" id="close-create-modal">Close</button>
-          <button type="button" class="btn btn-primary" id="create-user-btn">Create user</button>
-        </div>
-      </div>
+    <div class="modal fade" id="createUserModal" role="dialog">
+      <div class="modal-dialog">
       
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Modal Header</h4>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <label for="recipient-name" class="col-form-label">Name:</label>
+                <input type="text" class="form-control" id="newUserName">
+              </div>
+
+              <div class="form-group">
+                <label for="recipient-name" class="col-form-label">Email:</label>
+                <input type="text" class="form-control" id="newUserEmail">
+              </div>
+
+              <div class="form-group">
+                <label for="recipient-name" class="col-form-label">Password:</label>
+                <input type="text" class="form-control" id="newUserPassword">
+              </div>
+              
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal" id="close-create-modal">Close</button>
+            <button type="button" class="btn btn-primary" id="create-user-btn">Create user</button>
+          </div>
+        </div>
+        
+      </div>
     </div>
-  </div>
+
+    <!-- Update Modal -->
+    <div class="modal fade" id="updateUserModal" role="dialog">
+      <div class="modal-dialog">
+      
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Update user</h4>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <label for="recipient-name" class="col-form-label">Name:</label>
+                <input type="text" class="form-control" id="currentUserName">
+              </div>
+
+              <div class="form-group">
+                <label for="recipient-name" class="col-form-label">Email:</label>
+                <input type="text" class="form-control" id="currentUserEmail">
+              </div>
+
+              <div class="form-group">
+                <label for="recipient-name" class="col-form-label">Password:</label>
+                <input type="text" class="form-control" id="currentUserPassword">
+              </div>
+              
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal" id="close-update-modal">Close</button>
+            <button type="button" class="btn btn-primary" id="update-user-btn" data-userid="">Update user</button>
+          </div>
+        </div>
+        
+      </div>
+    </div>
     
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -81,6 +121,20 @@
       const getUsers = async () => {
         try {
           const URI = `http://localhost:3000/api/users`;
+
+          const response = await axios.get(URI);
+
+          return response.data;
+
+        } catch (error) {
+          console.log("🚀 ~ file: index.html ~ line 63 ~ getUsers ~ error", error)
+          return [];
+        }
+      }
+
+      const getUser = async (userId) => {
+        try {
+          const URI = `http://localhost:3000/api/user/${userId}`;
 
           const response = await axios.get(URI);
 
@@ -120,6 +174,20 @@
         }
       }
 
+      const updateUser = async (userId, data) => {
+        try {
+          const URI = `http://localhost:3000/api/user/${userId}`;
+
+          const response = await axios.put(URI, data);
+
+          return response.data;
+
+        } catch (error) {
+          console.log("🚀 ~ file: index.html ~ line 63 ~ updateUser ~ error", error)
+          return [];
+        }
+      }
+
       const handleDeleteUser = async (element) => {
         const userId = element.dataset.userid;
         console.log("🚀 ~ file: index.html ~ line 108 ~ deleteBtn.addEventListener ~ userId", userId);
@@ -138,17 +206,71 @@
         renderUsersTable(users);
       }
 
-      const renderUsersTable = (users) => {
+      const handleUpdateUser = async () => {
+        const name = document.querySelector('#currentUserName').value;
+        const email = document.querySelector('#currentUserEmail').value;
+        const password = document.querySelector('#currentUserPassword').value;
+
+        const payload = {
+          name,
+          email,
+          password
+        }
+        const userId = document.querySelector('#update-user-btn').dataset.userid;
+
+        // call API to update user
+        const updatedUser = await updateUser(userId, payload);
+
+        // Close update modal after finsish
+        const closeModalBtn = document.querySelector('#close-update-modal');
+        closeModalBtn.click();
+
+        // Render new user's data into table of users
+        const currentTableRow = document.querySelector(`tr[data-userid='${userId}']`);
+        currentTableRow.remove();
+        console.log("🚀 ~ file: index.html ~ line 234 ~ handleUpdateUser ~ currentTableRow", currentTableRow);
+
         const tableBody = document.querySelector('#tableBody');
+        const newUser = {
+          name,
+          email,
+          password,
+          _id: userId
+        }
+        renderUserRow(newUser)
         
-        users.forEach(user => {
-          let html = `<tr>
+      } 
+
+      const renderUpdateUser = async (element) => {
+        console.log("🚀 ~ file: index.html ~ line 196 ~ renderUpdateUser ~ element", element)
+        const userId = element.dataset.userid;
+        console.log("🚀 ~ file: index.html ~ line 198 ~ renderUpdateUser ~ userId", userId)
+        const user = await getUser(userId);
+        console.log("🚀 ~ file: index.html ~ line 200 ~ renderUpdateUser ~ user", user)
+
+        document.querySelector('#currentUserName').value = user.name;
+        document.querySelector('#currentUserEmail').value = user.email;
+        document.querySelector('#currentUserPassword').value = user.password;
+
+        document.querySelector('#update-user-btn').dataset.userid = userId;
+      }
+      
+      const renderUserRow = (user) => {
+        let html = `<tr data-userid=${user._id}>
                         <td>${user.email}</td>
                         <td>${user.name}</td>
                         <td>${user.password}</td>
                         <td><button class="btn btn-danger deleteUserBtn" data-userId=${user._id} onClick="handleDeleteUser(this)">Delete</button></td>
+                        <td><button class="btn btn-warning deleteUserBtn" data-userId=${user._id} onClick="renderUpdateUser(this)" data-toggle="modal" data-target="#updateUserModal">Update</button></td>
                       </tr>`;
-          tableBody.insertAdjacentHTML('afterbegin', html);
+        tableBody.insertAdjacentHTML('beforeend', html);
+      }
+
+      const renderUsersTable = (users) => {
+        const tableBody = document.querySelector('#tableBody');
+        
+        users.forEach(user => {
+          renderUserRow(user);
         })
       }
 
@@ -174,13 +296,7 @@
 
         // Render new user's data into table of users
         const tableBody = document.querySelector('#tableBody');
-        let html = `<tr>
-                      <td>${newUser.email}</td>
-                      <td>${newUser.name}</td>
-                      <td>${newUser.password}</td>
-                      <td><button class="btn btn-danger deleteUserBtn" data-userId=${newUser._id} onClick="handleDeleteUser(this)">Delete</button></td>
-                    </tr>`;
-        tableBody.insertAdjacentHTML('afterbegin', html);
+        renderUserRow(newUser);
       }
 
       document.addEventListener("DOMContentLoaded", async (event) => {
@@ -189,6 +305,9 @@
 
         const createUserBtn = document.querySelector('#create-user-btn');
         createUserBtn.addEventListener('click', handleCreateUser);
+
+        const updateUserBtn = document.querySelector('#update-user-btn');
+        updateUserBtn.addEventListener('click', handleUpdateUser);
       });
     </script>
   </body>
