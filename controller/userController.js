@@ -76,11 +76,33 @@ const deleteUser = async (req, res) => {
   }
 }
 
+const searchUser = async (req, res) => {
+  try {
+    const { query } = req.query;
+    console.log("🚀 ~ file: userController.js ~ line 82 ~ searchUser ~ req.query", req.query)
+
+
+    const condition = {
+      $or:[
+        {name: {$regex: query, $options: 'i'} }, // regular expression flag
+        {email: {$regex: query, $options: 'i'} }
+      ]
+    };
+
+    const users = await UserModel.find(condition);
+
+    return res.status(200).send(users);
+  } catch (error) {
+    console.log("🚀 ~ file: userController.js ~ line 93 ~ searchUser ~ error", error)
+  }
+};
+
 module.exports = {
   findAllUsers,
   findUserById,
   createUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  searchUser
 }
 

@@ -18,6 +18,24 @@
         <div class="col-12">
           <table class="table table-striped table-inverse table-responsive">
             <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#createUserModal">Create user</button>
+            
+            <div style="display: flex; justify-content: center">
+              <input class="form-control me-2" 
+                type="text" 
+                placeholder="Search" 
+                aria-label="Search"
+                id="search-user-box"
+                style="width: 50%; margin-right: 20px"
+              >
+              <button 
+                class="btn btn-outline-success" 
+                type="submit"
+                id="search-user-btn"
+              >
+                Search
+              </button>
+            </div>
+            
             <thead class="thead-inverse">
               <tr>
                 <th>Email</th>
@@ -28,7 +46,6 @@
               </tr>
               </thead>
               <tbody id="tableBody">
-               
                 
               </tbody>
           </table>
@@ -230,6 +247,22 @@
         renderUserRow(newUser);
       }
 
+      const handleSearchUser = async() => {
+        const query = document.querySelector('#search-user-box').value;
+        console.log("🚀 ~ file: index.html ~ line 252 ~ handleSearchUser ~ query", query);
+
+        // Call API
+        const users = await searchUser(query);
+        console.log("🚀 ~ file: index.html ~ line 256 ~ handleSearchUser ~ users", users)
+
+        // Remove old users value
+        const tableBody = document.querySelector('#tableBody');
+        tableBody.innerHTML = '';
+
+        // Render new users value
+        renderUsersTable(users);
+      }
+
       document.addEventListener("DOMContentLoaded", async (event) => {
         const users = await getUsers();
         renderUsersTable(users);
@@ -239,6 +272,10 @@
 
         const updateUserBtn = document.querySelector('#update-user-btn');
         updateUserBtn.addEventListener('click', handleUpdateUser);
+
+        const searchUserBtn = document.querySelector('#search-user-btn');
+        searchUserBtn.addEventListener('click', handleSearchUser);
+
       });
     </script>
   </body>

@@ -67,3 +67,17 @@ const updateUser = async (userId, data) => {
     return [];
   }
 }
+
+const searchUser = async (query) => {
+  try {
+    const URI = `http://localhost:3000/api/search?query=${query}`;
+
+    const response = await axios.get(URI);
+
+    return response.data;
+
+  } catch (error) {
+    console.log("🚀 ~ file: index.html ~ line 63 ~ updateUser ~ error", error)
+    return [];
+  }
+}
