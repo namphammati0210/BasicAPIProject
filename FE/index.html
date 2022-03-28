@@ -49,6 +49,14 @@
                 
               </tbody>
           </table>
+
+          <!-- Pagination -->
+          <nav aria-label="...">
+            <ul class="pagination pagination-lg">
+
+            </ul>
+          </nav>
+
         </div>
       </div>
     </div>
@@ -143,15 +151,7 @@
         const deletedUser = await deleteUser(userId);
         console.log("🚀 ~ file: index.html ~ line 123 ~ deleteBtn.addEventListener ~ deletedUser", deletedUser);
 
-        // get all users
-        const users = await getUsers();
-
-        // Remove old users value
-        const tableBody = document.querySelector('#tableBody');
-        tableBody.innerHTML = '';
-
-        // Render new users value
-        renderUsersTable(users);
+        const removedEle = document.querySelector(`tr[data-userid='${userId}']`).remove();
       }
 
       const handleUpdateUser = async () => {
@@ -222,6 +222,37 @@
         })
       }
 
+      const renderPaginationBar = (page, totalPages) => {
+        const paginationBar = document.querySelector('.pagination');
+        paginationBar.innerHTML = '';
+        
+        // Page start from 1 not 0
+        for(var i = 1; i <= totalPages; i++) {
+          if (i === page) {
+            const activePage = `<li class="page-item active" aria-current="page">
+                                  <span class="page-link">${i}</span>
+                                </li>`;
+                                paginationBar.insertAdjacentHTML('beforeend', activePage);                    
+          }else{
+            const page = `<li class="page-item">
+                            <a class="page-link" href="#" onClick="loadCurrentPage(${i})">${i}</a>
+                          </li>`
+            paginationBar.insertAdjacentHTML('beforeend', page);
+          }
+        }
+      };
+
+      const loadCurrentPage = async (page) => {
+        // Remove old users value
+        const tableBody = document.querySelector('#tableBody');
+        tableBody.innerHTML = '';
+
+        const { docs: users, page: currentPage, totalPages } = await getUsers({page, limit: 4});
+        renderUsersTable(users);
+        
+        renderPaginationBar(currentPage, totalPages);
+      }
+
       const handleCreateUser = async (event) => {
         // Get user's input from create user modal
         const name = document.querySelector('#newUserName').value;          
@@ -243,8 +274,9 @@
         closeModalBtn.click();
 
         // Render new user's data into table of users
-        const tableBody = document.querySelector('#tableBody');
-        renderUserRow(newUser);
+        // const tableBody = document.querySelector('#tableBody');
+        // renderUserRow(newUser);
+        await loadCurrentPage(1);
       }
 
       const handleSearchUser = async() => {
@@ -264,8 +296,8 @@
       }
 
       document.addEventListener("DOMContentLoaded", async (event) => {
-        const users = await getUsers();
-        renderUsersTable(users);
+        // Load first page
+        await loadCurrentPage(1);
 
         const createUserBtn = document.querySelector('#create-user-btn');
         createUserBtn.addEventListener('click', handleCreateUser);

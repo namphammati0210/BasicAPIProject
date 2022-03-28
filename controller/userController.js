@@ -3,7 +3,14 @@ const UserModel = require('../models/User');
 const findAllUsers = async (req, res, next) => {
   try {
     // Find all users
-    const users = await UserModel.find({});
+    const {page = 1, limit = 3} = req.query;
+
+    const options = {
+      page,
+      limit
+    }
+
+    const users = await UserModel.paginate({}, options);
 
     if (!users) return res.status(503).send('Service Unavailable');
 

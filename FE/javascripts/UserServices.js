@@ -1,6 +1,8 @@
-const getUsers = async () => {
+const getUsers = async (options) => {
   try {
-    const URI = `http://localhost:3000/api/users`;
+    const query = new URLSearchParams(options).toString();
+    console.log("🚀 ~ file: userServices.js ~ line 4 ~ getUsers ~ query", query)
+    const URI = `http://localhost:3000/api/users?${query}`;
 
     const response = await axios.get(URI);
 
