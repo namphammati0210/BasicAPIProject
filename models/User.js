@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const mongoosePaginate = require('mongoose-paginate-v2');
 require('dotenv').config();
 
 const Schema = mongoose.Schema;
@@ -34,6 +35,8 @@ userSchema.methods.createToken = async function() {
   }
   
 }
+
+userSchema.plugin(mongoosePaginate);
 
 const User = mongoose.model('User', userSchema);
 

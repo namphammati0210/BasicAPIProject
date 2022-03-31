@@ -1,6 +1,6 @@
-const getUsers = async () => {
+const getUsers = async (page, limit) => {
   try {
-    const URI = `http://localhost:3000/api/users`;
+    const URI = `http://localhost:3000/api/users?page=${page}&limit=${limit}`;
 
     const response = await axios.get(URI);
 

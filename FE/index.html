@@ -49,6 +49,15 @@
                 
               </tbody>
           </table>
+
+          <!-- Start Pagination -->
+          <nav aria-label="...">
+            <ul class="pagination pagination-lg">
+              
+            </ul>
+          </nav>
+          <!-- End Pagination -->
+
         </div>
       </div>
     </div>
@@ -136,23 +145,7 @@
     <script src="javascripts/UserServices.js"></script>
 
     <script>
-      const handleDeleteUser = async (element) => {
-        const userId = element.dataset.userid;
-        console.log("🚀 ~ file: index.html ~ line 108 ~ deleteBtn.addEventListener ~ userId", userId);
-
-        const deletedUser = await deleteUser(userId);
-        console.log("🚀 ~ file: index.html ~ line 123 ~ deleteBtn.addEventListener ~ deletedUser", deletedUser);
-
-        // get all users
-        const users = await getUsers();
-
-        // Remove old users value
-        const tableBody = document.querySelector('#tableBody');
-        tableBody.innerHTML = '';
-
-        // Render new users value
-        renderUsersTable(users);
-      }
+      
 
       const handleUpdateUser = async () => {
         const name = document.querySelector('#currentUserName').value;
@@ -216,10 +209,35 @@
 
       const renderUsersTable = (users) => {
         const tableBody = document.querySelector('#tableBody');
-        
+        tableBody.innerHTML = '';
+
         users.forEach(user => {
           renderUserRow(user);
         })
+      }
+
+      const renderPage = async (page, limit=5) => {
+        const { totalPages, page: currentPage, docs: users } = await getUsers(page, limit);
+        renderUsersTable(users);
+        renderPagination(totalPages, currentPage);
+      }
+ 
+      const renderPagination = async (totalPages, currentPage) => {
+        const paginationSection = document.querySelector('ul.pagination');
+        paginationSection.innerHTML='';
+        // debugger;
+        for(let i = 1; i <= totalPages; i++) {
+          if(currentPage === i) {
+            const activePage = `<li class="page-item active" aria-current="page">
+                                  <span class="page-link">${i}</span>
+                                </li>`;
+            paginationSection.insertAdjacentHTML('beforeend', activePage);
+          }else {
+            const unActivePage = `<li class="page-item"><a class="page-link" onClick="renderPage(${i})" >${i}</a></li>`;
+            paginationSection.insertAdjacentHTML('beforeend', unActivePage);
+          }
+        }
+
       }
 
       const handleCreateUser = async (event) => {
@@ -243,8 +261,7 @@
         closeModalBtn.click();
 
         // Render new user's data into table of users
-        const tableBody = document.querySelector('#tableBody');
-        renderUserRow(newUser);
+        renderPage(1)
       }
 
       const handleSearchUser = async() => {
@@ -263,9 +280,24 @@
         renderUsersTable(users);
       }
 
-      document.addEventListener("DOMContentLoaded", async (event) => {
+      const handleDeleteUser = async (element) => {
+        const userId = element.dataset.userid;
+        console.log("🚀 ~ file: index.html ~ line 108 ~ deleteBtn.addEventListener ~ userId", userId);
+
+        const deletedUser = await deleteUser(userId);
+        console.log("🚀 ~ file: index.html ~ line 123 ~ deleteBtn.addEventListener ~ deletedUser", deletedUser);
+
+        // get all users
         const users = await getUsers();
-        renderUsersTable(users);
+
+        // Remove old users value
+        const removedElement = document.querySelector(`tr[data-userid='${userId}'`);
+        removedElement.remove();
+      }
+      
+      document.addEventListener("DOMContentLoaded", async (event) => {
+        // Render first page (page = 1)
+        renderPage(1);
 
         const createUserBtn = document.querySelector('#create-user-btn');
         createUserBtn.addEventListener('click', handleCreateUser);
